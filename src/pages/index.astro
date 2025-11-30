@@ -81,27 +81,22 @@ const cleanVal = (val) => val?.toString().replace(/\u2014/g, "-") || "";
     <script src="./libs/bootstrap.bundle.min.js" defer></script>
     
 
-    <!-- Inizializzazione DataTables -->
-    <script type="module">
-  import DataTable from './libs/simple-datatables.mjs';
-      document.addEventListener("DOMContentLoaded", function () {
-        if (typeof DataTable === "undefined") {
-          console.error("DataTable non trovato!");
-          return;
-        }
+   <script type="module">
+  import { DataTable } from './libs/simple-datatables.mjs';
 
-        const table = document.querySelector("#sheetTable");
-        new DataTable(table, {
-          perPage: 10,
-          perPageSelect: [10, 25, 50, 100],
-          layout: {
-            topStart: "search",
-            topEnd: "perPage",
-            bottomStart: "info",
-            bottomEnd: "pagination"
-          }
-        });
-      });
-    </script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const table = document.querySelector("#sheetTable");
+    new DataTable(table, {
+      perPage: 10,
+      perPageSelect: [10, 25, 50, 100],
+      layout: {
+        topStart: "search",
+        topEnd: "perPage",
+        bottomStart: "info",
+        bottomEnd: "pagination"
+      }
+    });
+  });
+</script>
   </body>
 </html>
