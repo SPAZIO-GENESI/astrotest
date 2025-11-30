@@ -3,7 +3,7 @@ name: Deploy Astro site to GitHub Pages
 on:
   push:
     branches: ["main"]
-  workflow_dispatch:
+  workflow_dispatch: # permette di avviare manualmente
 
 permissions:
   contents: read
