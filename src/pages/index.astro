@@ -1,7 +1,4 @@
 ---
-import { onMount } from 'solid-js';
-
-// URL della tua action / JSON
 const apiUrl = "https://cfg_googledata.it-e3f.workers.dev/?sheet=1Ef7n23TnmRFfpdzp4D24v0kKDrBxGQnhUPI6CNOASU4&f=A3SD21";
 
 let metaTitle = "Catalogo libri";
@@ -29,9 +26,6 @@ try {
 } catch (err) {
   console.error("Errore nel fetch (build):", err);
 }
-
-// funzione per pulire i dati da caratteri problematici
-const cleanVal = (val) => val?.toString().replace(/\u2014/g, "-") || "";
 ---
 
 <html lang="it">
@@ -42,13 +36,14 @@ const cleanVal = (val) => val?.toString().replace(/\u2014/g, "-") || "";
     <meta property="og:title" content={metaTitle} />
     <meta property="og:description" content={metaDesc} />
 
-    <!-- Bootstrap 5 locale -->
+    <!-- Bootstrap 5 CSS locale -->
     <link href="./libs/bootstrap.min.css" rel="stylesheet"/>
 
-    <!-- Simple-DataTables locale -->
+    <!-- Simple-DataTables CSS locale -->
     <link href="./libs/style.css" rel="stylesheet"/>
   </head>
   <body class="container py-4">
+
     <header class="mb-4">
       <h1 class="h3">{metaTitle}</h1>
       <p class="text-muted">{metaDesc}</p>
@@ -67,8 +62,8 @@ const cleanVal = (val) => val?.toString().replace(/\u2014/g, "-") || "";
               {r.map((val, idx) => (
                 <td>
                   {headers[idx] === "copertina" || headers[idx] === "cdn"
-                    ? val ? <img src={val} alt="copertina" style="max-width:80px; height:auto;" /> : null
-                    : cleanVal(val)}
+                    ? <img src={val} alt="copertina" style="max-width:80px; height:auto;" />
+                    : val}
                 </td>
               ))}
             </tr>
@@ -77,26 +72,27 @@ const cleanVal = (val) => val?.toString().replace(/\u2014/g, "-") || "";
       </table>
     </main>
 
-    <!-- JS locali -->
+    <!-- Bootstrap JS locale -->
     <script src="./libs/bootstrap.bundle.min.js" defer></script>
-    
 
-   <script type="module">
-  import { DataTable } from './libs/simple-datatables.mjs';
+    <!-- Simple-DataTables ESM -->
+    <script type="module">
+      import { DataTable } from './libs/simple-datatables.mjs';
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const table = document.querySelector("#sheetTable");
-    new DataTable(table, {
-      perPage: 10,
-      perPageSelect: [10, 25, 50, 100],
-      layout: {
-        topStart: "search",
-        topEnd: "perPage",
-        bottomStart: "info",
-        bottomEnd: "pagination"
-      }
-    });
-  });
-</script>
+      const table = document.querySelector("#sheetTable");
+      new DataTable(table, {
+        perPage: 10,
+        perPageSelect: [10, 25, 50, 100],
+        sortable: true,         // abilita ordinamento sulle colonne
+        searchable: true,       // abilita ricerca globale
+        layout: {
+          topStart: "search",
+          topEnd: "perPage",
+          bottomStart: "info",
+          bottomEnd: "pagination"
+        }
+      });
+    </script>
+
   </body>
 </html>
