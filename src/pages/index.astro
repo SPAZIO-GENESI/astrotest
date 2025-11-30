@@ -1,11 +1,18 @@
 ---
-var sheetId = '1Ef7n23TnmRFfpdzp4D24v0kKDrBxGQnhUPI6CNOASU4';
-const apiUrl = `https://cfg_googledata.it-e3f.workers.dev/?sheet=${sheetId}&f=A3SD21`; 
-const res = await fetch(apiUrl);
-const rows = await res.json();
+const sheetId = '1Ef7n23TnmRFfpdzp4D24v0kKDrBxGQnhUPI6CNOASU4';
+const apiUrl = `https://cfg_googledata.it-e3f.workers.dev/?sheet=${sheetId}&f=A3SD21`;
 
-// Meta dinamici
-const metaTitle = rows.length > 0 ? `Tabella: ${rows[0].Nome}` : "Tabella Dati";
+let rows = [];
+
+try {
+  const res = await fetch(apiUrl);
+  rows = await res.json();
+} catch (err) {
+  console.error("Errore nel fetch dei dati:", err);
+}
+
+// Meta dinamici con fallback
+const metaTitle = rows.length > 0 ? `Tabella: ${rows[0].Nome ?? 'Record'}` : "Tabella Dati";
 const metaDesc = `Visualizza ${rows.length} record dal Google Sheet in tabella interattiva.`;
 ---
 
@@ -30,24 +37,29 @@ const metaDesc = `Visualizza ${rows.length} record dal Google Sheet in tabella i
   </head>
   <body class="container mt-5">
     <h1>{metaTitle}</h1>
-    <table id="sheetTable" class="table table-striped">
-      <thead>
-        <tr>
-          {Object.keys(rows[0]).map(key => (
-            <th>{key}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(row => (
+
+    {rows.length > 0 ? (
+      <table id="sheetTable" class="table table-striped">
+        <thead>
           <tr>
-            {Object.values(row).map(val => (
-              <td>{val}</td>
+            {Object.keys(rows[0]).map(key => (
+              <th>{key}</th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr>
+              {Object.values(row).map((val) => (
+                <td>{val}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p>Nessun dato disponibile</p>
+    )}
 
     <!-- jQuery + DataTables + Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
