@@ -2,8 +2,7 @@
 const sheetId = '1Ef7n23TnmRFfpdzp4D24v0kKDrBxGQnhUPI6CNOASU4';
 const apiUrl = `https://cfg_googledata.it-e3f.workers.dev/?sheet=${sheetId}&f=A3SD21`;
 
-// Meta statici (puoi personalizzarli)
-const metaTitle = "Tabella Dati";
+const metaTitle = "Catalogo libri";
 const metaDesc = "Visualizza i dati dal Google Sheet tramite Worker process.";
 ---
 
@@ -46,34 +45,37 @@ const metaDesc = "Visualizza i dati dal Google Sheet tramite Worker process.";
       document.addEventListener("DOMContentLoaded", async function() {
         try {
           const res = await fetch("{apiUrl}");
-          const rows = await res.json();
+          const data = await res.json();
 
-          if (rows.length > 0) {
-            // Header
-            const headerRow = document.getElementById("headerRow");
-            Object.keys(rows[0]).forEach(key => {
-              const th = document.createElement("th");
-              th.textContent = key;
-              headerRow.appendChild(th);
+          // Estraggo intestazioni e righe
+          const headers = data.values[0];
+          const rows = data.values.slice(1);
+
+          // Header
+          const headerRow = document.getElementById("headerRow");
+          headers.forEach(h => {
+            const th = document.createElement("th");
+            th.textContent = h;
+            headerRow.appendChild(th);
+          });
+
+          // Body
+          const bodyRows = document.getElementById("bodyRows");
+          rows.forEach(r => {
+            const tr = document.createElement("tr");
+            r.forEach(val => {
+              const td = document.createElement("td");
+              td.textContent = val;
+              tr.appendChild(td);
             });
+            bodyRows.appendChild(tr);
+          });
 
-            // Body
-            const bodyRows = document.getElementById("bodyRows");
-            rows.forEach(row => {
-              const tr = document.createElement("tr");
-              Object.values(row).forEach(val => {
-                const td = document.createElement("td");
-                td.textContent = val;
-                tr.appendChild(td);
-              });
-              bodyRows.appendChild(tr);
-            });
-
-            // Inizializza DataTable
-            $('#sheetTable').DataTable();
-          } else {
-            document.getElementById("sheetTable").insertAdjacentHTML("afterend", "<p>Nessun dato disponibile</p>");
-          }
+          // Inizializza DataTable
+          $('#sheetTable').DataTable({
+            pageLength: 10,
+            lengthMenu: [10, 25, 50, 100],
+          });
         } catch (err) {
           console.error("Errore nel fetch:", err);
           document.getElementById("sheetTable").insertAdjacentHTML("afterend", "<p>Errore nel caricamento dati</p>");
