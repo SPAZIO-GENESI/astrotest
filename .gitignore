@@ -1,5 +1,5 @@
 # build output E LA DISTRIBUZIONE DEI FILE PRODOTTI DALLA BUILD
-# dist/
+dist/
 
 # generated types
 .astro/
