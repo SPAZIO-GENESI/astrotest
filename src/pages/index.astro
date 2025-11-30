@@ -82,7 +82,7 @@ const cleanVal = (val) => val?.toString().replace(/\u2014/g, "-") || "";
     <script src="./libs/simple-datatables.js" defer></script>
 
     <!-- Inizializzazione DataTables -->
-    <script type="text/javascript">
+    <script type="text/javascript" defer>
       document.addEventListener("DOMContentLoaded", function () {
         if (typeof DataTable === "undefined") {
           console.error("DataTable non trovato!");
