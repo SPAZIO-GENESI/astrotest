@@ -1,4 +1,7 @@
 ---
+import { onMount } from 'solid-js';
+
+// URL della tua action / JSON
 const apiUrl = "https://cfg_googledata.it-e3f.workers.dev/?sheet=1Ef7n23TnmRFfpdzp4D24v0kKDrBxGQnhUPI6CNOASU4&f=A3SD21";
 
 let metaTitle = "Catalogo libri";
@@ -23,78 +26,79 @@ try {
     metaTitle = titolo && autore ? `Catalogo: ${titolo} di ${autore}` : metaTitle;
     metaDesc = abstract || metaDesc;
   }
-
-  // 🔧 FIX: normalizza le righe per evitare errori `.find()`
-  rows = rows.map((r) => {
-    if (r.length < headers.length) {
-      return [...r, ...Array(headers.length - r.length).fill("—")];
-    }
-    return r;
-  });
-
 } catch (err) {
   console.error("Errore nel fetch (build):", err);
 }
+
+// funzione per pulire i dati da caratteri problematici
+const cleanVal = (val) => val?.toString().replace(/\u2014/g, "-") || "";
 ---
+
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
     <title>{metaTitle}</title>
     <meta name="description" content={metaDesc} />
+    <meta property="og:title" content={metaTitle} />
+    <meta property="og:description" content={metaDesc} />
 
-    <!-- Bootstrap 5 -->
-    <link crossorigin="anonymous" href="/libs/bootstrap.min.css" rel="stylesheet"/>
-    
-    <!-- Simple-DataTables -->
-    <link crossorigin="anonymous" href="/libs/style.css" rel="stylesheet"/>
+    <!-- Bootstrap 5 locale -->
+    <link href="/libs/bootstrap.min.css" rel="stylesheet"/>
 
-    <!-- 🔧 CSS migliorato -->
-    <style>
-      body { background:#f8f9fa; }
-      table img { max-width: 80px; border-radius: 4px; }
-      table tbody tr:hover { background-color: #f1f1f1; }
-      table thead th { background:#343a40; color:white; text-transform:capitalize; }
-    </style>
+    <!-- Simple-DataTables locale -->
+    <link href="/libs/style.css" rel="stylesheet"/>
   </head>
   <body class="container py-4">
-    <h1 class="text-center mb-4">{metaTitle}</h1>
-    <p class="text-muted">{metaDesc}</p>
+    <header class="mb-4">
+      <h1 class="h3">{metaTitle}</h1>
+      <p class="text-muted">{metaDesc}</p>
+    </header>
 
-    <table id="sheetTable" class="table table-striped table-bordered table-sm">
-      <thead>
-        <tr>{headers.map((h) => <th>{h}</th>)}</tr>
-      </thead>
-      <tbody>
-        {rows.map((r) => (
+    <main>
+      <table id="sheetTable" class="table table-striped table-bordered">
+        <thead>
           <tr>
-            {r.map((val, idx) => {
-              const safeVal = val || "—";
-              return (
-                <td>
-                  {["copertina", "cdn"].includes(headers[idx])
-                    ? <img src={safeVal} alt="copertina" />
-                    : safeVal}
-                </td>
-              );
-            })}
+            {headers.map((h) => <th>{h}</th>)}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr>
+              {r.map((val, idx) => (
+                <td>
+                  {headers[idx] === "copertina" || headers[idx] === "cdn"
+                    ? val ? <img src={val} alt="copertina" style="max-width:80px; height:auto;" /> : null
+                    : cleanVal(val)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </main>
 
-    <!-- JS -->
+    <!-- JS locali -->
+    <script src="/libs/bootstrap.bundle.min.js" defer></script>
     <script src="/libs/simple-datatables.js" defer></script>
 
-    <script>
+    <!-- Inizializzazione DataTables -->
+    <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function () {
-        const table = document.querySelector("#sheetTable");
-        if (!table) return;
+        if (typeof DataTable === "undefined") {
+          console.error("DataTable non trovato!");
+          return;
+        }
 
-        new simpleDatatables.DataTable(table, {
+        const table = document.querySelector("#sheetTable");
+        new DataTable(table, {
           perPage: 10,
           perPageSelect: [10, 25, 50, 100],
-          searchable: true,
-          pagination: true
+          layout: {
+            topStart: "search",
+            topEnd: "perPage",
+            bottomStart: "info",
+            bottomEnd: "pagination"
+          }
         });
       });
     </script>
