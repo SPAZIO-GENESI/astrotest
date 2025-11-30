@@ -1,7 +1,7 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://SPAZIO-GENESI.github.io/astro-test/',
+  site: 'https://spazio-genesi.github.io/astrotest',
+  base: '/astrotest/',
   output: 'static'
 });
